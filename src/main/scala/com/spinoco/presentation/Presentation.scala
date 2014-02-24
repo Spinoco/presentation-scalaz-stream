@@ -2,7 +2,6 @@ package com.spinoco.presentation
 
 import scalaz.stream.{wye, Process}
 import scalaz.concurrent.Task
-import java.util.UUID
 import scala.util.Random
 import scalaz.stream.Process.Process1
 
@@ -13,6 +12,12 @@ import scalaz.stream.Process.Process1
  */
 object Presentation {
 
+  /**
+   * Simulates fetching different organization names, then creating hostnames from it,
+   * then merging it into one stream
+   *
+   * @param args
+   */
   def main(args:Array[String]):Unit = {
 
     val sites1 = List("google", "scala-lang", "spinoco", "twitter", "github")
@@ -57,4 +62,3 @@ object Presentation {
   }
 
 }
-
