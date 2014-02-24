@@ -23,6 +23,15 @@ object Presentation {
     val sites1 = List("google", "scala-lang", "spinoco", "twitter", "github")
     val sites2 = List("goal", "myspace", "stackoverflow", "atlassian")
 
+    /**
+     * Source of origanization names.
+     *
+     * @param sites source of sites (this is an example program, in real world it would fetch the site from db for example)
+     * @param mark mark the stream with string, so it can be distinguished from other streams
+     * @param wait value that simulates doing some work, so we can watch, how this method is emitting elements
+     *
+     * @return source of (mark, hostname)
+     */
     def urlSource(sites:List[String], mark:String = "1", wait: => Unit = ()):Process[Task, String Pair String] = Process.await {
       val site = sites((new Random()).nextInt(sites.length))
       Task{
@@ -31,6 +40,12 @@ object Presentation {
       }
     }(element => Process.emit(element -> mark) fby urlSource(sites, mark, wait))
 
+    /**
+     * Take an organization site, evaluate it's value
+     *
+     * @param string organization site
+     * @return value if the site can be evaluated
+     */
     def rankFunction(string:String):Process[Task, String] = {
       val res = string.toList match {
         case 's' :: _ => Process.emit("nice page")
@@ -40,6 +55,9 @@ object Presentation {
       res.toSource
     }
 
+    /**
+     * Simply print everything in the console
+     */
     val printProcess:Process.Sink[Task, Any] = Process.repeatEval {
       Task.now((x:Any) => Task.now(println(x)))
     }
@@ -48,7 +66,14 @@ object Presentation {
     val url2 = urlSource(sites2, "2", Thread.sleep(200L))
     val wyed = url1.wye(url2)(wye.merge)
 
-    def numElements[A](count:Int):Process1[A, (A, Int)] = Process.receive1{
+    /**
+     * Zip the elements with running sum of all elements, that have passed this process
+     *
+     * @param count stating count of elements
+     * @tparam A
+     * @return
+     */
+    def numElements[A](count:Int = 0):Process1[A, (A, Int)] = Process.receive1{
       element => Process.emit(element -> (count + 1)) fby numElements((count + 1))
     }
 
