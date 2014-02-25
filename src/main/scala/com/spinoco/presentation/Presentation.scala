@@ -47,19 +47,18 @@ object Presentation {
      * @return value if the site can be evaluated
      */
     def rankFunction(string:String):Process[Task, String] = {
-      val res = string.toList match {
+      string.toList match {
         case 's' :: _ => Process.emit("nice page")
         case 'g' :: _ => Process.emit("quite nice page")
         case _ => Process.halt
       }
-      res.toSource
     }
 
     /**
      * Simply print everything in the console
      */
-    val printProcess:Process.Sink[Task, Any] = Process.repeatEval {
-      Task.now((x:Any) => Task.now(println(x)))
+    val printProcess:Process.Sink[Task, Any] = Process.constant {
+      (x:Any) => Task.now(println(x))
     }
 
     val url1 = urlSource(sites1, "1", Thread.sleep(1000L))
